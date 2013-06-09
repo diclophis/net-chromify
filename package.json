@@ -5,7 +5,7 @@
     "main" : "index.js",
     "repository" : {
         "type" : "git",
-        "url" : "http://github.com/iceddev/net-chromify.git"
+        "url" : "http://github.com/diclophis/net-chromify.git"
     },
     "keywords" : [
         "net",
