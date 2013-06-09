@@ -37,7 +37,7 @@ var arrayBufferToBuffer = function(arrayBuffer) {
   var buffer = new Buffer(arrayBuffer.byteLength);
   var uint8Array = new Uint8Array(arrayBuffer);
   for(var i = 0; i < uint8Array.length; i++) {
-    buffer.writeUInt8(uint8Array[i], i);
+    buffer.writeUInt8(uint8Array[i], i, true);
   }
   return buffer;
 };
@@ -213,12 +213,13 @@ net.Socket = function(options) {
   this._socketInfo = 0;
   this._encoding;
 
+
   if(createNew){
     chrome.socket.create("tcp", {}, function(createInfo) {
       self._socketInfo = createInfo;
       self.emit("_created"); // This event doesn't exist in the API, it is here because Chrome is async
       // start trying to read
-      // self._read();
+      self._read();
     });
   }
 };
@@ -268,6 +269,7 @@ net.Socket.prototype.connect = function() {
 
   chrome.socket.connect(self._socketInfo.socketId, options.host, options.port, function(result) {
     if(result == 0) {
+      self._read();
       self.emit('connect');
     }
     else {
