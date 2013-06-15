@@ -306,16 +306,18 @@ net.Socket.prototype.setKeepAlive = function(enable, delay) {
 
 net.Socket.prototype._read = function() {
   var self = this;
-  chrome.socket.read(self._socketInfo.socketId, function(readInfo) {
-    if(readInfo.resultCode < 0) return;
-    // ArrayBuffer to Buffer if no encoding.
-    var buffer = arrayBufferToBuffer(readInfo.data);
-    self.emit('data', buffer);
-    if (self.ondata) self.ondata(buffer.parent, buffer.offset, buffer.offset + buffer.length);
-  });
+  if (self._socketInfo.socketId) {
+      chrome.socket.read(self._socketInfo.socketId, function(readInfo) {
+        if(readInfo.resultCode < 0) return;
+        // ArrayBuffer to Buffer if no encoding.
+        var buffer = arrayBufferToBuffer(readInfo.data);
+        self.emit('data', buffer);
+        if (self.ondata) self.ondata(buffer.parent, buffer.offset, buffer.offset + buffer.length);
+      });
 
-  // enque another read soon. TODO: Is there are better way to controll speed.
-  self._readTimer = setTimeout(self._read.bind(self), 100);
+      // enque another read soon. TODO: Is there are better way to controll speed.
+      self._readTimer = setTimeout(self._read.bind(self), 1000 / 24);
+  }
 };
 
 net.Socket.prototype.write = function(data, encoding, callback) {
